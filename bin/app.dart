@@ -1,63 +1,72 @@
-import 'package:taller_complementario/model/cola_prioridad_model.dart';
+import 'dart:io';
+
+import 'package:console/console.dart';
 import 'package:taller_complementario/model/paciente_model.dart';
+import 'package:taller_complementario/model/cola_prioridad_model.dart';
 
 void main(List<String> arguments) {
-  PriorityQueue priorityQueue = PriorityQueue();
+  loopApp();
+}
 
-  Patient patientLaura = Patient(
-    name: 'Laura',
-    age: 23,
-    severity: 5,
-  );
-  Patient patientJuan = Patient(
-    name: 'Juan',
-    age: 21,
-    severity: 5,
-  );
-  Patient patientMartha = Patient(
-    name: 'Martha',
-    age: 35,
-    severity: 2,
-  );
-  Patient patientLucas = Patient(
-    name: 'Lucas',
-    age: 10,
-    severity: 1,
-  );
-  Patient patientCarlos = Patient(
-    name: 'Carlos',
-    age: 26,
-    severity: 5,
-  );
-  Patient patientDavid = Patient(
-    name: 'David',
-    age: 18,
-    severity: 3,
-  );
-  Patient patientMaicol = Patient(
-    name: 'Maicol',
-    age: 43,
-    severity: 1,
-  );
+void loopApp() {
+  PriorityQueue priorityQueue = PriorityQueue(10);
+  Console.init();
 
-  priorityQueue.insertNewPatient(patientMaicol);
-  priorityQueue.insertNewPatient(patientDavid);
-  priorityQueue.insertNewPatient(patientCarlos);
-  priorityQueue.insertNewPatient(patientLucas);
-  priorityQueue.insertNewPatient(patientMartha);
-  priorityQueue.insertNewPatient(patientJuan);
-  priorityQueue.insertNewPatient(patientLaura);
+  while (true) {
+    final opc = _initChooser(opcMenu);
 
-  for (int i = 0; i < (priorityQueue.length); i++) {
-    print("$i - ${priorityQueue.patients[i].severity}");
+    if (opc == 'Salir') {
+      break;
+    }
+
+    switch (opc) {
+      case 'Ingresar Paciente':
+        final patient = Patient();
+
+        stdout.write("\nNombre Completo del Paciente: ");
+        var name = stdin.readLineSync();
+        stdout.write("Edad del Paciente: ");
+        var age = stdin.readLineSync();
+        stdout.write("Síntomas o motivo de consulta: ");
+        var details = stdin.readLineSync();
+        stdout.write("Gravedad: ");
+        var severity = stdin.readLineSync();
+        stdout.write("\n");
+
+        patient.setName(name);
+        patient.setAge(int.parse(age!));
+        patient.setDetails(details);
+        patient.setSeverity(int.parse(severity!));
+
+        priorityQueue.insertNewPatient(patient);
+
+        priorityQueue.sortPriorityQueue();
+
+        priorityQueue.printPriorityQueue();
+
+        break;
+      case 'Pasar siguiente paciente':
+        priorityQueue.getNext();
+        break;
+      case 'Mostrar la cola':
+        priorityQueue.printPriorityQueue();
+        break;
+    }
   }
+}
 
-  priorityQueue.sortPriorityQueue();
+List<String> opcMenu = [
+  'Ingresar Paciente',
+  'Pasar siguiente paciente',
+  'Mostrar la cola',
+  'Salir'
+];
 
-  for (int i = 0; i < (priorityQueue.length); i++) {
-    print(
-        "ORDEN $i - ${priorityQueue.patients[i].severity} : ${priorityQueue.patients[i].name}");
-  }
-
-  print(priorityQueue.getNext()?.name);
+String _initChooser(List<String> opc) {
+  stdout.write("\n");
+  var chooser = Chooser<String>(
+    opc,
+    message: '\nSeleccione una opción: ',
+  );
+  return chooser.chooseSync();
 }
